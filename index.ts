@@ -1,4 +1,6 @@
 import { Input, Select } from "https://deno.land/x/cliffy/prompt.ts";
+import { basename, extname } from "https://deno.land/std/path/mod.ts";
+
 const { exit, run } = Deno;
 
 const p = run({
@@ -21,7 +23,8 @@ const diffOutput = await p.output();
 const stagedFilesStr = new TextDecoder().decode(diffOutput);
 const stagedFilesArray = stagedFilesStr
   .split("\n")
-  .filter((fileName) => fileName.length);
+  .filter((fileName) => fileName.length)
+  .map((fileName) => basename(fileName, extname(fileName)));
 
 if (!stagedFilesArray.length) {
   console.error("No files have been staged");
@@ -65,4 +68,9 @@ if (scope === "Custom") {
 
 const message: string = await Input.prompt(`Message:`);
 
-console.log({ commitType, scope, message });
+const resolvedMessage = `${commitType}(${scope}): ${message}`;
+console.log(`\nCommit message: '${resolvedMessage}'\n`);
+
+await run({
+  cmd: ["git", "commit", "-m", resolvedMessage],
+}).status();
