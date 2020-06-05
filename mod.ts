@@ -76,11 +76,11 @@ const stagedFilesArray = stagedFilesStr
             scope,
             filePath,
             fileName,
-            ScopeFormatter
+            ScopeFormatter,
           );
           return scope;
         },
-        { formattedScope: "", alreadyFormatted: false }
+        { formattedScope: "", alreadyFormatted: false },
       );
       fileNameForList = scopeFormatResult.formattedScope;
     }
@@ -106,7 +106,7 @@ const commitTypeDict: Record<string, string> = {
 };
 
 let commitType: string = await Input.prompt(
-  `Type: (f)eat (F)ix (c)hore (r)efactor (s)tyle (b)uild (d)ocs`
+  `Type: (f)eat (F)ix (c)hore (r)efactor (s)tyle (b)uild (d)ocs`,
 );
 
 if (commitType.length === 1) {
@@ -145,7 +145,7 @@ function applyScopeFormatter(
   scope: ScopeFormatResult,
   filePath: string,
   fileName: string,
-  { test, includeParentDirs }: DgcmScopeFormatter
+  { test, includeParentDirs }: DgcmScopeFormatter,
 ): ScopeFormatResult {
   const regex = new RegExp(test);
   if (!regex.test(fileName)) {
@@ -157,7 +157,7 @@ function applyScopeFormatter(
 
   if (scope.alreadyFormatted) {
     console.error(
-      "mutliple scopeFormatters apply to filename which is not currently supported"
+      "mutliple scopeFormatters apply to filename which is not currently supported",
     );
     console.error(filePath);
     exit(1);
@@ -166,14 +166,14 @@ function applyScopeFormatter(
   const pathParts = dirname(filePath).split(sep);
   if (includeParentDirs > pathParts.length) {
     console.error(
-      `config.includeParentDirs "${includeParentDirs}" is greater than the directory depth`
+      `config.includeParentDirs "${includeParentDirs}" is greater than the directory depth`,
     );
     console.error(filePath);
     exit(1);
   }
 
   const requiredPathParts = pathParts.slice(
-    pathParts.length - includeParentDirs
+    pathParts.length - includeParentDirs,
   );
   // join with underscore so we can apply case formatter later
   const requiredPathPartsString = requiredPathParts.join("_");
