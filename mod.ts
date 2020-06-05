@@ -155,7 +155,7 @@ async function getScope(stagedFilesArray: string[]) {
   return scope;
 }
 
-function applyScopeFormatter(
+export function applyScopeFormatter(
   scope: ScopeFormatResult,
   filePath: string,
   fileName: string,
