@@ -38,15 +38,11 @@ await run({
   cmd: ["git", "commit", "-m", finalCommitMessage],
 }).status();
 
-async function loadConfig(): Promise<DgcmConfig> {
+async function loadConfig(): Promise<DgcmConfig | undefined> {
   const config = await Config.load({
     file: "dgcm",
     searchDir: cwd(),
   });
-  if (!config) {
-    console.log("config is 'undefined' when no config files were found");
-    return exit(1);
-  }
 
   return config;
 }
