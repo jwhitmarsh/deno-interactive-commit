@@ -128,9 +128,13 @@ if (scope === "Custom") {
   scope = await Input.prompt(`Custom scope:`);
 }
 
+if (scope.length) {
+  scope = `(${scope})`;
+}
+
 const message: string = await Input.prompt(`Message:`);
 
-const resolvedMessage = `${commitType}(${scope}): ${message}`;
+const resolvedMessage = `${commitType}${scope}: ${message}`;
 console.log(`\nCommit message: '${resolvedMessage}'\n`);
 
 await run({
