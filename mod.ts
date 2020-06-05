@@ -25,121 +25,135 @@ interface ScopeFormatResult {
   alreadyFormatted: boolean;
 }
 
-const readPermission = await Deno.permissions.request({
-  name: "read",
-  path: "./",
-});
-if (readPermission.state !== "granted") {
-  console.error("Read permission required");
-  exit(1);
+const config = await loadConfig();
+const diffOutput = await getDiffOuput();
+const stagedFilesArray = getStagedFilesArray(diffOutput);
+const commitType = await getCommitType();
+const scope = await getScope();
+const message = await Input.prompt(`Message:`);
+
+const finalCommitMessage = `${commitType}${scope}: ${message}`;
+
+await run({
+  cmd: ["git", "commit", "-m", finalCommitMessage],
+}).status();
+
+async function loadConfig(): Promise<DgcmConfig> {
+  const config = await Config.load({
+    file: "dgcm",
+    searchDir: cwd(),
+  });
+  if (!config) {
+    console.log("config is 'undefined' when no config files were found");
+    return exit(1);
+  }
+
+  return config;
 }
 
-const config: DgcmConfig | undefined = await Config.load({
-  file: "dgcm",
-  searchDir: cwd(),
-});
-if (!config) {
-  console.log("config is 'undefined' when no config files were found");
-  exit(1);
-}
-
-const p = run({
-  cmd: ["git", "diff", "--name-only", "--cached"],
-  stdout: "piped",
-  stderr: "piped",
-});
-
-// await its completion
-const { code } = await p.status();
-if (code !== 0) {
-  const rawError = await p.stderrOutput();
-  const errorString = new TextDecoder().decode(rawError);
-  console.error(`Error fetching staged files list:`);
-  console.error(errorString);
-  exit(code);
-}
-
-const diffOutput = await p.output();
-const stagedFilesStr = new TextDecoder().decode(diffOutput);
-
-const stagedFilesArray = stagedFilesStr
-  .split("\n")
-  .filter((filePath) => filePath.length)
-  .map((filePath) => {
-    const fileName = basename(filePath, extname(filePath));
-    let fileNameForList = fileName;
-
-    if (config?.scopeFormatters?.length) {
-      const scopeFormatResult = config?.scopeFormatters?.reduce(
-        (scope, ScopeFormatter) => {
-          scope = applyScopeFormatter(
-            scope,
-            filePath,
-            fileName,
-            ScopeFormatter,
-          );
-          return scope;
-        },
-        { formattedScope: "", alreadyFormatted: false },
-      );
-      fileNameForList = scopeFormatResult.formattedScope;
-    }
-
-    return fileNameForList;
+async function getDiffOuput() {
+  const p = run({
+    cmd: ["git", "diff", "--name-only", "--cached"],
+    stdout: "piped",
+    stderr: "piped",
   });
 
-if (!stagedFilesArray.length) {
-  console.error("No files have been staged");
-  exit(1);
+  // await its completion
+  const { code } = await p.status();
+  if (code !== 0) {
+    const rawError = await p.stderrOutput();
+    const errorString = new TextDecoder().decode(rawError);
+    console.error(`Error fetching staged files list:`);
+    console.error(errorString);
+    exit(code);
+  }
+
+  return p.output();
 }
 
-stagedFilesArray.push("Custom");
+function getStagedFilesArray(diffOutput: Uint8Array) {
+  const stagedFilesStr = new TextDecoder().decode(diffOutput);
 
-const commitTypeDict: Record<string, string> = {
-  f: "feat",
-  F: "fix",
-  c: "chore",
-  r: "refactor",
-  s: "style",
-  b: "build",
-  d: "docs",
-};
+  const stagedFilesArray = stagedFilesStr
+    .split("\n")
+    .filter((filePath) => filePath.length)
+    .map((filePath) => {
+      const fileName = basename(filePath, extname(filePath));
+      let fileNameForList = fileName;
 
-let commitType: string = await Input.prompt(
-  `Type: (f)eat (F)ix (c)hore (r)efactor (s)tyle (b)uild (d)ocs`,
-);
+      if (config?.scopeFormatters?.length) {
+        const scopeFormatResult = config?.scopeFormatters?.reduce(
+          (scope, ScopeFormatter) => {
+            scope = applyScopeFormatter(
+              scope,
+              filePath,
+              fileName,
+              ScopeFormatter,
+            );
+            return scope;
+          },
+          { formattedScope: "", alreadyFormatted: false },
+        );
+        fileNameForList = scopeFormatResult.formattedScope;
+      }
 
-if (commitType.length === 1) {
-  const resolvedCommitType = commitTypeDict[commitType];
-  if (!resolvedCommitType) {
-    console.error(`Unrecognised shortcut "${commitType}"`);
+      return fileNameForList;
+    });
+
+  if (!stagedFilesArray.length) {
+    console.error("No files have been staged");
     exit(1);
   }
 
-  commitType = resolvedCommitType;
+  stagedFilesArray.push("Custom");
+
+  return stagedFilesArray;
 }
 
-let scope: string = await Select.prompt({
-  message: "Scope:",
-  options: stagedFilesArray,
-});
+async function getCommitType() {
+  const commitTypeDict: Record<string, string> = {
+    f: "feat",
+    F: "fix",
+    c: "chore",
+    r: "refactor",
+    s: "style",
+    b: "build",
+    d: "docs",
+  };
 
-if (scope === "Custom") {
-  scope = await Input.prompt(`Custom scope:`);
+  let commitType: string = await Input.prompt(
+    `Type: (f)eat (F)ix (c)hore (r)efactor (s)tyle (b)uild (d)ocs`,
+  );
+
+  if (commitType.length === 1) {
+    const resolvedCommitType = commitTypeDict[commitType];
+    if (!resolvedCommitType) {
+      console.error(`Unrecognised shortcut "${commitType}"`);
+      exit(1);
+    }
+
+    commitType = resolvedCommitType;
+  }
+
+  return commitType;
 }
 
-if (scope.length) {
-  scope = `(${scope})`;
+async function getScope() {
+  let scope: string = await Select.prompt({
+    message: "Scope:",
+    options: stagedFilesArray,
+  });
+
+  if (scope === "Custom") {
+    scope = await Input.prompt(`Custom scope:`);
+  }
+
+  if (scope.length) {
+    scope = `(${scope})`;
+  }
+
+  return scope;
 }
-
-const message: string = await Input.prompt(`Message:`);
-
-const resolvedMessage = `${commitType}${scope}: ${message}`;
-console.log(`\nCommit message: '${resolvedMessage}'\n`);
-
-await run({
-  cmd: ["git", "commit", "-m", resolvedMessage],
-}).status();
 
 function applyScopeFormatter(
   scope: ScopeFormatResult,
