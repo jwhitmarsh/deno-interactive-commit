@@ -1,3 +1,5 @@
+#!/usr/bin/env deno --allow-run --allow-read --unstable
+
 import { Input, Select } from "https://deno.land/x/cliffy/prompt.ts";
 import {
   basename,
@@ -25,18 +27,20 @@ interface ScopeFormatResult {
   alreadyFormatted: boolean;
 }
 
-const config = await loadConfig();
-const diffOutput = await getDiffOuput();
-const stagedFilesArray = getStagedFilesArray(diffOutput);
-const commitType = await getCommitType();
-const scope = await getScope();
-const message = await Input.prompt(`Message:`);
+export async function digcm() {
+  const config = await loadConfig();
+  const diffOutput = await getDiffOuput();
+  const stagedFilesArray = getStagedFilesArray(diffOutput, config);
+  const commitType = await getCommitType();
+  const scope = await getScope(stagedFilesArray);
+  const message = await Input.prompt(`Message:`);
 
-const finalCommitMessage = `${commitType}${scope}: ${message}`;
+  const finalCommitMessage = `${commitType}${scope}: ${message}`;
 
-await run({
-  cmd: ["git", "commit", "-m", finalCommitMessage],
-}).status();
+  await run({
+    cmd: ["git", "commit", "-m", finalCommitMessage],
+  }).status();
+}
 
 async function loadConfig(): Promise<DgcmConfig | undefined> {
   const config = await Config.load({
@@ -67,7 +71,7 @@ async function getDiffOuput() {
   return p.output();
 }
 
-function getStagedFilesArray(diffOutput: Uint8Array) {
+function getStagedFilesArray(diffOutput: Uint8Array, config?: DgcmConfig) {
   const stagedFilesStr = new TextDecoder().decode(diffOutput);
 
   const stagedFilesArray = stagedFilesStr
@@ -118,7 +122,7 @@ async function getCommitType() {
   };
 
   let commitType: string = await Input.prompt(
-    `Type: (f)eat (F)ix (c)hore (r)efactor (s)tyle (b)uild (d)ocs`,
+    `Commit type:`,
   );
 
   if (commitType.length === 1) {
@@ -134,7 +138,7 @@ async function getCommitType() {
   return commitType;
 }
 
-async function getScope() {
+async function getScope(stagedFilesArray: string[]) {
   let scope: string = await Select.prompt({
     message: "Scope:",
     options: stagedFilesArray,
