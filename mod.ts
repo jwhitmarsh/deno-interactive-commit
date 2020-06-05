@@ -119,6 +119,7 @@ async function getCommitType() {
     s: "style",
     b: "build",
     d: "docs",
+    t: "tests",
   };
 
   let commitType: string = await Input.prompt(
