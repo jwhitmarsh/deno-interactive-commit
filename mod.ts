@@ -163,7 +163,8 @@ export function applyScopeFormatter(
   { test, includeParentDirs }: DgcmScopeFormatter,
 ): ScopeFormatResult {
   const regex = new RegExp(test);
-  if (!regex.test(fileName)) {
+
+  if (!regex.test(filePath)) {
     return {
       formattedScope: fileName,
       alreadyFormatted: scope.alreadyFormatted,
