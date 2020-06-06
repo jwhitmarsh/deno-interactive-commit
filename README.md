@@ -4,7 +4,9 @@ A CLI to step you through creating a formatted git commit message, using the for
 
 ## Install
 
-`deno install --allow-read --allow-run --unstable git@github.com:jwhitmarsh/deno-interactive-commit -n digcm`
+The `-n` value is the name of the command that will be installed as, so you can change this to an abbreviation that suits you.
+
+`deno install --allow-read --allow-run --unstable -n digcm https://raw.githubusercontent.com/jwhitmarsh/deno-interactive-commit/master/cli.ts`
 
 ## Permissions
 
@@ -46,7 +48,7 @@ Define tranformations for the `scope` part of the message. This allows you to in
 | includeParentDirs | Number of parent directory names to include |
 | transformCase     | Case transformation to apply                |
 
-Example
+##### Example
 
 This parser would convert `/src/api/users/model.ts` to `UsersModel`
 
