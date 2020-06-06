@@ -63,3 +63,9 @@ This parser would convert `/src/api/users/model.ts` to `UsersModel`
   ]
 }
 ```
+
+## Roadmap
+
+- add more tests
+- add optional prompt for commit message body
+- extend config to allow more `scopeParser` options
