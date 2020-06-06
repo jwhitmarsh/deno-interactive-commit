@@ -8,7 +8,11 @@ import {
   dirname,
 } from "https://deno.land/std/path/mod.ts";
 import { Config } from "https://raw.githubusercontent.com/eankeen/config/master/mod.ts";
-import { pascalCase } from "https://deno.land/x/case/mod.ts";
+import {
+  pascalCase,
+  camelCase,
+  snakeCase,
+} from "https://deno.land/x/case/mod.ts";
 
 const { exit, run, cwd } = Deno;
 
@@ -19,7 +23,7 @@ interface DgcmConfig {
 interface DgcmScopeFormatter {
   test: string;
   includeParentDirs: number;
-  case: "camel" | "pascal";
+  transformCase: "camel" | "pascal" | "snake";
 }
 
 interface ScopeFormatResult {
@@ -159,14 +163,14 @@ async function getScope(stagedFilesArray: string[]) {
 export function applyScopeFormatter(
   scope: ScopeFormatResult,
   filePath: string,
-  fileName: string,
-  { test, includeParentDirs }: DgcmScopeFormatter,
+  filename: string,
+  { test, includeParentDirs, transformCase }: DgcmScopeFormatter,
 ): ScopeFormatResult {
   const regex = new RegExp(test);
 
   if (!regex.test(filePath)) {
     return {
-      formattedScope: fileName,
+      formattedScope: filename,
       alreadyFormatted: scope.alreadyFormatted,
     };
   }
@@ -194,8 +198,26 @@ export function applyScopeFormatter(
   // join with underscore so we can apply case formatter later
   const requiredPathPartsString = requiredPathParts.join("_");
 
+  let caseFormatter;
+  switch (transformCase) {
+    case "pascal":
+      caseFormatter = pascalCase;
+      break;
+    case "snake":
+      caseFormatter = snakeCase;
+      break;
+    case "camel":
+      caseFormatter = camelCase;
+      break;
+    default:
+      console.error(
+        `unrecognised config.transformCase "${transformCase}"`,
+      );
+      return exit(1);
+  }
+
   return {
-    formattedScope: pascalCase(`${requiredPathPartsString}_${fileName}`),
+    formattedScope: caseFormatter(`${requiredPathPartsString}_${filename}`),
     alreadyFormatted: true,
   };
 }
