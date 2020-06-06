@@ -2,6 +2,8 @@
 
 A CLI to step you through creating a formatted git commit message based on the files that you have staged, using the format `type(scope): message`, e.g., `feat(UsersModel): add "lastLogin" property`.
 
+![demo](https://github.com/jwhitmarsh/deno-interactive-commit/blob/master/demo.gif)
+
 ## Install
 
 The `-n` value is the name of the command that will be installed as, so you can change this to an abbreviation that suits you.
