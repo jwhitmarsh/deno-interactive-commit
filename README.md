@@ -1,6 +1,6 @@
 # Deno Interactive Git Commit
 
-A CLI to step you through creating a formatted git commit message, using the format `type(scope): message`
+A CLI to step you through creating a formatted git commit message based on the files that you have staged, using the format `type(scope): message`, e.g., `feat(UsersModel): add "lastLogin" property`.
 
 ## Install
 
