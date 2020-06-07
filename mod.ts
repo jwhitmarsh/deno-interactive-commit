@@ -116,8 +116,8 @@ function getStagedFilesArray(diffOutput: Uint8Array, config?: DgcmConfig) {
 
 async function getCommitType() {
   const commitTypeDict: Record<string, string> = {
-    f: "feat",
-    F: "fix",
+    F: "feat",
+    f: "fix",
     c: "chore",
     r: "refactor",
     s: "style",
