@@ -140,16 +140,23 @@ async function getCommitType(customShortcuts?: Record<string, string>) {
     `Commit type:`,
   );
 
-  if (commitType.length === 1) {
-    const resolvedCommitType = commitTypeDict[commitType];
-    if (!resolvedCommitType) {
-      throw Error(`Unrecognised shortcut "${commitType}"`);
-    }
+  return getResolvedCommitType(commitType, commitTypeDict);
+}
 
-    commitType = resolvedCommitType;
+export function getResolvedCommitType(
+  commitType: string,
+  commitTypeDict: Record<string, string>,
+) {
+  if (commitType.length > 1) {
+    return commitType;
   }
 
-  return commitType;
+  const resolvedCommitType = commitTypeDict[commitType];
+  if (!resolvedCommitType) {
+    throw Error(`Unrecognised shortcut "${commitType}"`);
+  }
+
+  return resolvedCommitType;
 }
 
 async function getScope(stagedFilesArray: string[]) {
