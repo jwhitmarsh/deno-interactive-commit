@@ -182,18 +182,16 @@ export function applyScopeFormatter(
 
   if (scope.alreadyFormatted) {
     console.error(
-      "mutliple scopeFormatters apply to filename which is not currently supported",
+      `Mutliple scopeFormatters apply to filename which is not currently supported. Filepath: ${filePath}`,
     );
-    console.error(filePath);
     exit(1);
   }
 
   const pathParts = dirname(filePath).split(sep);
   if (includeParentDirs > pathParts.length) {
     console.error(
-      `config.includeParentDirs "${includeParentDirs}" is greater than the directory depth`,
+      `config.includeParentDirs "${includeParentDirs}" is greater than the directory depth. Filepath: ${filePath}`,
     );
-    console.error(filePath);
     exit(1);
   }
 
