@@ -33,18 +33,23 @@ interface ScopeFormatResult {
 }
 
 export async function digcm() {
-  const config = await loadConfig();
-  const diffOutput = await getDiffOuput();
-  const stagedFilesArray = getStagedFilesArray(diffOutput, config);
-  const commitType = await getCommitType(config?.shortcuts);
-  const scope = await getScope(stagedFilesArray);
-  const message = await Input.prompt(`Message:`);
+  try {
+    const config = await loadConfig();
+    const diffOutput = await getDiffOuput();
+    const stagedFilesArray = getStagedFilesArray(diffOutput, config);
+    const commitType = await getCommitType(config?.shortcuts);
+    const scope = await getScope(stagedFilesArray);
+    const message = await Input.prompt(`Message:`);
 
-  const finalCommitMessage = `${commitType}${scope}: ${message}`;
+    const finalCommitMessage = `${commitType}${scope}: ${message}`;
 
-  await run({
-    cmd: ["git", "commit", "-m", finalCommitMessage],
-  }).status();
+    await run({
+      cmd: ["git", "commit", "-m", finalCommitMessage],
+    }).status();
+  } catch (error) {
+    console.error(error.message);
+    exit(1);
+  }
 }
 
 async function loadConfig(): Promise<DgcmConfig | undefined> {
@@ -68,9 +73,7 @@ async function getDiffOuput() {
   if (code !== 0) {
     const rawError = await p.stderrOutput();
     const errorString = new TextDecoder().decode(rawError);
-    console.error(`Error fetching staged files list:`);
-    console.error(errorString);
-    exit(code);
+    throw Error(`Error fetching staged files list:\n${errorString}`);
   }
 
   return p.output();
@@ -106,8 +109,7 @@ function getStagedFilesArray(diffOutput: Uint8Array, config?: DgcmConfig) {
     });
 
   if (!stagedFilesArray.length) {
-    console.error("No files have been staged");
-    exit(1);
+    throw Error("No files have been staged");
   }
 
   stagedFilesArray.push("Custom");
@@ -138,8 +140,7 @@ async function getCommitType(customShortcuts?: Record<string, string>) {
   if (commitType.length === 1) {
     const resolvedCommitType = commitTypeDict[commitType];
     if (!resolvedCommitType) {
-      console.error(`Unrecognised shortcut "${commitType}"`);
-      exit(1);
+      throw Error(`Unrecognised shortcut "${commitType}"`);
     }
 
     commitType = resolvedCommitType;
@@ -181,18 +182,16 @@ export function applyScopeFormatter(
   }
 
   if (scope.alreadyFormatted) {
-    console.error(
+    throw Error(
       `Mutliple scopeFormatters apply to filename which is not currently supported. Filepath: ${filePath}`,
     );
-    exit(1);
   }
 
   const pathParts = dirname(filePath).split(sep);
   if (includeParentDirs > pathParts.length) {
-    console.error(
+    throw Error(
       `config.includeParentDirs "${includeParentDirs}" is greater than the directory depth. Filepath: ${filePath}`,
     );
-    exit(1);
   }
 
   const requiredPathParts = pathParts.slice(
@@ -213,10 +212,9 @@ export function applyScopeFormatter(
       caseFormatter = camelCase;
       break;
     default:
-      console.error(
+      throw Error(
         `unrecognised config.transformCase "${transformCase}"`,
       );
-      return exit(1);
   }
 
   return {
