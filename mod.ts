@@ -79,7 +79,10 @@ async function getDiffOuput() {
   return p.output();
 }
 
-function getStagedFilesArray(diffOutput: Uint8Array, config?: DgcmConfig) {
+export function getStagedFilesArray(
+  diffOutput: Uint8Array,
+  config?: DgcmConfig,
+) {
   const stagedFilesStr = new TextDecoder().decode(diffOutput);
 
   const stagedFilesArray = stagedFilesStr
