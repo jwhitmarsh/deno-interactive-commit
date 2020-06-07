@@ -48,7 +48,7 @@ export async function digcm() {
 
 async function loadConfig(): Promise<DgcmConfig | undefined> {
   const config = await Config.load({
-    file: "dgcm",
+    file: "digcm",
     searchDir: cwd(),
   });
 
