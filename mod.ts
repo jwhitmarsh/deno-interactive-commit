@@ -18,6 +18,7 @@ const { exit, run, cwd } = Deno;
 
 interface DgcmConfig {
   scopeFormatters?: DgcmScopeFormatter[];
+  shortcuts?: Record<string, string>;
 }
 
 interface DgcmScopeFormatter {
@@ -35,7 +36,7 @@ export async function digcm() {
   const config = await loadConfig();
   const diffOutput = await getDiffOuput();
   const stagedFilesArray = getStagedFilesArray(diffOutput, config);
-  const commitType = await getCommitType();
+  const commitType = await getCommitType(config?.shortcuts);
   const scope = await getScope(stagedFilesArray);
   const message = await Input.prompt(`Message:`);
 
@@ -114,7 +115,7 @@ function getStagedFilesArray(diffOutput: Uint8Array, config?: DgcmConfig) {
   return stagedFilesArray;
 }
 
-async function getCommitType() {
+async function getCommitType(customShortcuts?: Record<string, string>) {
   const commitTypeDict: Record<string, string> = {
     F: "feat",
     f: "fix",
@@ -125,6 +126,10 @@ async function getCommitType() {
     d: "docs",
     t: "tests",
   };
+
+  if (customShortcuts) {
+    Object.assign(commitTypeDict, customShortcuts);
+  }
 
   let commitType: string = await Input.prompt(
     `Commit type:`,

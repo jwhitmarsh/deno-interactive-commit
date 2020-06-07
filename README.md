@@ -66,6 +66,26 @@ This parser would convert `/src/api/users/model.ts` to `UsersModel`
 }
 ```
 
+#### shortcuts
+
+Define a dictionary of shortcuts for setting the commit type. This will extend and override the default shortcuts.
+
+| Prop      | Value                                   |
+| --------- | --------------------------------------- |
+| shortcuts | Dictionary of shortcut -> resolved type |
+
+##### Example
+
+This configuration would add the shortcut "c" that resolves to "customType"
+
+```json
+{
+  "shortcuts": {
+    "c": "customType"
+  }
+}
+```
+
 ## Roadmap
 
 - add more tests
