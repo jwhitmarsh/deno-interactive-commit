@@ -40,7 +40,7 @@ Config should be stored in a `.digcm.{json,yaml,yml,toml}` file.
 
 ### Options
 
-#### scopeParsers
+#### scopeFormatters
 
 Define tranformations for the `scope` part of the message. This allows you to include parent directories and change the case.
 
@@ -56,7 +56,7 @@ This parser would convert `/src/api/users/model.ts` to `UsersModel`
 
 ```json
 {
-  "scopeParsers": [
+  "scopeFormatters": [
     {
       "test": "model",
       "includeParentDirs": 1,
