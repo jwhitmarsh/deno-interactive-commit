@@ -1,6 +1,6 @@
 #!/usr/bin/env deno --allow-run --allow-read --unstable
 
-import { Input, Select } from "cliffy/prompt/mod.ts";
+import { Checkbox, Input } from "cliffy/prompt/mod.ts";
 import { basename, dirname, extname, sep } from "std/path/mod.ts";
 import { camelCase, pascalCase, snakeCase } from "case/mod.ts";
 import { Config } from "https://raw.githubusercontent.com/eankeen/config/v1.1/mod.ts";
@@ -151,13 +151,18 @@ export function getResolvedCommitType(
 }
 
 async function getScope(stagedFilesArray: string[]) {
-  let scope: string = await Select.prompt({
+  let scope: string;
+  const selectedScope: string[] = await Checkbox.prompt({
     message: "Scope:",
     options: stagedFilesArray,
   });
 
-  if (scope === "Custom") {
+  if (selectedScope[0] === "Custom") {
     scope = await Input.prompt(`Custom scope:`);
+  } else if (selectedScope.length) {
+    scope = selectedScope.join(",");
+  } else {
+    scope = "";
   }
 
   if (scope.length) {
