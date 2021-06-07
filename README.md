@@ -4,6 +4,9 @@ A CLI to step you through creating a formatted git commit message based on the f
 
 ![demo](https://github.com/jwhitmarsh/deno-interactive-commit/blob/master/demo.gif)
 
+## Development
+DIGCM uses [velociraptor](https://velociraptor.run/) as a script runner. Run `vr` to see available scripts.
+
 ## Install
 
 The `-n` value is the name of the command that will be installed as, so you can change this to an abbreviation that suits you.

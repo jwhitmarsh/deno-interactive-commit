@@ -1,0 +1,11 @@
+allow:
+  - run
+  - read
+
+imap: import_map.json
+
+unstable: true
+
+scripts:
+  start: cli.ts
+  test: deno test
