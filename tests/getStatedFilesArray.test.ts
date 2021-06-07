@@ -1,7 +1,4 @@
-import {
-  assertThrows,
-  assertEquals,
-} from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals, assertThrows } from "std/testing/asserts.ts";
 import { getStagedFilesArray } from "../mod.ts";
 
 Deno.test("getStagedFilesArray - throws if diffOutput is empty", () => {

@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals } from "std/testing/asserts.ts";
 import { applyScopeFormatter } from "../mod.ts";
 
 Deno.test("applyScopeFormatter - 1 parent dirs", () => {

@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "/": "./",
+    "./": "./",
+    "case/": "https://deno.land/x/case@v2.1.0/",
+    "cliffy/": "https://deno.land/x/cliffy@v0.19.1/",
+    "std/": "https://deno.land/std@0.97.0/"
+  }
+}

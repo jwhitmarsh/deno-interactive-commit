@@ -1,18 +1,9 @@
 #!/usr/bin/env deno --allow-run --allow-read --unstable
 
-import { Input, Select } from "https://deno.land/x/cliffy/prompt.ts";
-import {
-  basename,
-  extname,
-  sep,
-  dirname,
-} from "https://deno.land/std/path/mod.ts";
-import { Config } from "https://raw.githubusercontent.com/eankeen/config/master/mod.ts";
-import {
-  pascalCase,
-  camelCase,
-  snakeCase,
-} from "https://deno.land/x/case/mod.ts";
+import { Input, Select } from "cliffy/prompt/mod.ts";
+import { basename, dirname, extname, sep } from "std/path/mod.ts";
+import { camelCase, pascalCase, snakeCase } from "case/mod.ts";
+import { Config } from "https://raw.githubusercontent.com/eankeen/config/v1.1/mod.ts";
 
 const { exit, run, cwd } = Deno;
 
@@ -35,7 +26,7 @@ interface ScopeFormatResult {
 export async function digcm() {
   try {
     const config = await loadConfig();
-    const diffOutput = await getDiffOuput();
+    const diffOutput = await getDiffOutput();
     const stagedFilesArray = getStagedFilesArray(diffOutput, config);
     const commitType = await getCommitType(config?.shortcuts);
     const scope = await getScope(stagedFilesArray);
@@ -61,7 +52,7 @@ async function loadConfig(): Promise<DgcmConfig | undefined> {
   return config;
 }
 
-async function getDiffOuput() {
+async function getDiffOutput() {
   const p = run({
     cmd: ["git", "diff", "--name-only", "--cached"],
     stdout: "piped",
@@ -136,7 +127,7 @@ async function getCommitType(customShortcuts?: Record<string, string>) {
     Object.assign(commitTypeDict, customShortcuts);
   }
 
-  let commitType: string = await Input.prompt(
+  const commitType: string = await Input.prompt(
     `Commit type:`,
   );
 
@@ -153,7 +144,7 @@ export function getResolvedCommitType(
 
   const resolvedCommitType = commitTypeDict[commitType];
   if (!resolvedCommitType) {
-    throw Error(`Unrecognised shortcut "${commitType}"`);
+    throw Error(`Unrecognized shortcut "${commitType}"`);
   }
 
   return resolvedCommitType;
@@ -193,7 +184,7 @@ export function applyScopeFormatter(
 
   if (scope.alreadyFormatted) {
     throw Error(
-      `Mutliple scopeFormatters apply to filename which is not currently supported. Filepath: ${filePath}`,
+      `Multiple scopeFormatters apply to filename which is not currently supported. Filepath: ${filePath}`,
     );
   }
 
@@ -223,7 +214,7 @@ export function applyScopeFormatter(
       break;
     default:
       throw Error(
-        `unrecognised config.transformCase "${transformCase}"`,
+        `Unrecognized config.transformCase "${transformCase}"`,
       );
   }
 
