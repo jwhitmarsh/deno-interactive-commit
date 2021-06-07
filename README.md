@@ -42,7 +42,7 @@ Config should be stored in a `.digcm.{json,yaml,yml,toml}` file.
 
 #### scopeFormatters
 
-Define tranformations for the `scope` part of the message. This allows you to include parent directories and change the case.
+Define transformations for the `scope` part of the message. This allows you to include parent directories and change the case.
 
 | Prop              | Value                                       |
 | ----------------- | ------------------------------------------- |
@@ -89,5 +89,4 @@ This configuration would add the shortcut "c" that resolves to "customType"
 ## Roadmap
 
 - add more tests
-- add optional prompt for commit message body
 - extend config to allow more `scopeParser` options

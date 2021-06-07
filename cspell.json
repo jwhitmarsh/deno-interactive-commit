@@ -1,0 +1,20 @@
+{
+    "version": "0.1",
+    "words": [
+        "Deno",
+        "Dgcm",
+        "digcm",
+        "efactor",
+        "hore",
+        "jwhitmarsh",
+        "Roadmap",
+        "stdlib",
+        "tyle",
+        "uild"
+    ],
+    "ignorePaths": [
+        "node_modules",
+        "coverage",
+        "yarn.lock"
+    ]
+}

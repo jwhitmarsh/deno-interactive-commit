@@ -1,5 +1,3 @@
-// cspell:words hore efactor tyle uild
-
 import { Command } from "cliffy/command/command.ts";
 
 import { digcm } from "./mod.ts";
