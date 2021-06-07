@@ -31,11 +31,18 @@ export async function digcm() {
     const commitType = await getCommitType(config?.shortcuts);
     const scope = await getScope(stagedFilesArray);
     const message = await Input.prompt(`Message:`);
+    const body = await Input.prompt(`Body:`);
 
     const finalCommitMessage = `${commitType}${scope}: ${message}`;
 
+    const cmd = ["git", "commit", "-m", finalCommitMessage];
+
+    if (body.length) {
+      cmd.push("-m", body);
+    }
+
     await run({
-      cmd: ["git", "commit", "-m", finalCommitMessage],
+      cmd,
     }).status();
   } catch (error) {
     console.error(error.message);
