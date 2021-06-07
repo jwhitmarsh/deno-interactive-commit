@@ -1,11 +1,13 @@
 #!/usr/bin/env deno --allow-run --allow-read --unstable
 
-import { Checkbox, Input } from "cliffy/prompt/mod.ts";
+import { Checkbox, Input, prompt, Select } from "cliffy/prompt/mod.ts";
 import { basename, dirname, extname, sep } from "std/path/mod.ts";
 import { camelCase, pascalCase, snakeCase } from "case/mod.ts";
 import { Config } from "https://raw.githubusercontent.com/eankeen/config/v1.1/mod.ts";
 
 const { exit, run, cwd } = Deno;
+
+const CUSTOM = "Custom";
 
 interface DgcmConfig {
   scopeFormatters?: DgcmScopeFormatter[];
@@ -113,7 +115,7 @@ export function getStagedFilesArray(
     throw Error("No files have been staged");
   }
 
-  stagedFilesArray.push("Custom");
+  stagedFilesArray.push(CUSTOM);
 
   return stagedFilesArray;
 }
@@ -159,12 +161,17 @@ export function getResolvedCommitType(
 
 async function getScope(stagedFilesArray: string[]) {
   let scope: string;
-  const selectedScope: string[] = await Checkbox.prompt({
+  const selectedScope: string[] = await prompt([{
+    type: stagedFilesArray.filter((f) => f !== CUSTOM).length === 1
+      ? Select
+      : Checkbox,
     message: "Scope:",
+    // deno-lint-ignore ban-ts-comment
+    // @ts-expect-error
     options: stagedFilesArray,
-  });
+  }]);
 
-  if (selectedScope[0] === "Custom") {
+  if (selectedScope[0] === CUSTOM) {
     scope = await Input.prompt(`Custom scope:`);
   } else if (selectedScope.length) {
     scope = selectedScope.join(",");
