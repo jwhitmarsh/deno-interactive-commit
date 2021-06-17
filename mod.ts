@@ -245,6 +245,9 @@ export function applyScopeFormatter(
     case "path":
       caseFormatter = pathCase;
       break;
+    case undefined:
+      caseFormatter = (str: string) => str;
+      break;
     default:
       throw Error(
         `Unrecognized config.transformCase "${transformCase}"`,
