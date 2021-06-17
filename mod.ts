@@ -2,7 +2,13 @@
 
 import { Checkbox, Input, prompt, Select } from "cliffy/prompt/mod.ts";
 import { basename, dirname, extname, sep } from "std/path/mod.ts";
-import { camelCase, pascalCase, snakeCase } from "case/mod.ts";
+import {
+  camelCase,
+  paramCase,
+  pascalCase,
+  pathCase,
+  snakeCase,
+} from "case/mod.ts";
 import { Config } from "https://raw.githubusercontent.com/eankeen/config/v1.1/mod.ts";
 
 const { exit, run, cwd } = Deno;
@@ -17,7 +23,7 @@ interface DgcmConfig {
 interface DgcmScopeFormatter {
   test: string;
   includeParentDirs: number;
-  transformCase: "camel" | "pascal" | "snake";
+  transformCase: "camel" | "pascal" | "snake" | "kebab" | "param" | "path";
 }
 
 interface ScopeFormatResult {
@@ -230,6 +236,15 @@ export function applyScopeFormatter(
       break;
     case "camel":
       caseFormatter = camelCase;
+      break;
+    case "kebab":
+      caseFormatter = paramCase;
+      break;
+    case "param":
+      caseFormatter = paramCase;
+      break;
+    case "path":
+      caseFormatter = pathCase;
       break;
     default:
       throw Error(
