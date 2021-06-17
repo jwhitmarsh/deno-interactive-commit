@@ -167,22 +167,21 @@ export function getResolvedCommitType(
 
 async function getScope(stagedFilesArray: string[]) {
   let scope: string;
-  const selectedScope: string[] = await prompt([{
+  const selectedScope = await prompt([{
     type: stagedFilesArray.filter((f) => f !== CUSTOM).length === 1
       ? Select
       : Checkbox,
     message: "Scope:",
-    // deno-lint-ignore ban-ts-comment
-    // @ts-expect-error
     options: stagedFilesArray,
+    name: "scope",
   }]);
 
-  if (selectedScope[0] === CUSTOM) {
+  scope = Array.isArray(selectedScope.scope)
+    ? selectedScope.scope.join(",")
+    : selectedScope.scope ?? "";
+
+  if (scope === CUSTOM) {
     scope = await Input.prompt(`Custom scope:`);
-  } else if (selectedScope.length) {
-    scope = selectedScope.join(",");
-  } else {
-    scope = "";
   }
 
   if (scope.length) {
