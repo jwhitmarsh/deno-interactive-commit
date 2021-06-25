@@ -23,6 +23,7 @@ interface DgcmConfig {
 interface DgcmScopeFormatter {
   test: string;
   includeParentDirs: number;
+  prefix?: string;
   transformCase: "camel" | "pascal" | "snake" | "kebab" | "param" | "path";
 }
 
@@ -195,13 +196,13 @@ export function applyScopeFormatter(
   scope: ScopeFormatResult,
   filePath: string,
   filename: string,
-  { test, includeParentDirs, transformCase }: DgcmScopeFormatter,
+  { test, includeParentDirs, prefix, transformCase }: DgcmScopeFormatter,
 ): ScopeFormatResult {
   const regex = new RegExp(test);
 
   if (!regex.test(filePath)) {
     return {
-      formattedScope: filename,
+      formattedScope: scope.formattedScope ?? filename,
       alreadyFormatted: scope.alreadyFormatted,
     };
   }
@@ -222,8 +223,11 @@ export function applyScopeFormatter(
   const requiredPathParts = pathParts.slice(
     pathParts.length - includeParentDirs,
   );
-  // join with underscore so we can apply case formatter later
-  const requiredPathPartsString = requiredPathParts.join("_");
+
+  const fullPath = [...requiredPathParts];
+  if (prefix) {
+    fullPath.unshift(prefix);
+  }
 
   let caseFormatter;
   switch (transformCase) {
@@ -255,7 +259,9 @@ export function applyScopeFormatter(
   }
 
   return {
-    formattedScope: caseFormatter(`${requiredPathPartsString}_${filename}`),
+    formattedScope: caseFormatter([...fullPath, filename].join(
+      transformCase ? "_" : "/",
+    )),
     alreadyFormatted: true,
   };
 }
