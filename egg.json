@@ -1,0 +1,9 @@
+{
+  "name": "digcm",
+  "description": "Interactive git commit message writer",
+  "stable": true,
+  "files": [
+    "cli.ts",
+    "mod.ts"
+  ]
+}

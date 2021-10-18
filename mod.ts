@@ -202,7 +202,9 @@ export function applyScopeFormatter(
 
   if (!regex.test(filePath)) {
     return {
-      formattedScope: scope.formattedScope ?? filename,
+      formattedScope: scope.formattedScope?.length
+        ? scope.formattedScope
+        : filename,
       alreadyFormatted: scope.alreadyFormatted,
     };
   }
